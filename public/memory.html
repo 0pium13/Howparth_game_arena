@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Flip - HowParth Game Arena</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #4a90e2;
+            --primary-light: #6ba8ff;
+            --primary-dark: #2a5caa;
+            --secondary-color: #ff6b6b;
+            --secondary-light: #ff8e8e;
+            --secondary-dark: #cc3d3d;
+            --background-color: #0f172a;
+            --accent-color: #1e293b;
+            --text-color: #ffffff;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--background-color);
+            font-family: 'Poppins', sans-serif;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(74, 144, 226, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 20%);
+            background-attachment: fixed;
+            color: var(--text-color);
+        }
+
+        .top-bar {
+            width: 100%;
+            padding: 1rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat span {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .game-container {
+            margin-top: 5rem;
+            position: relative;
+            padding: 2rem;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(74, 144, 226, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 2rem;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .play-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .play-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .play-button:active {
+            transform: translateY(0);
+        }
+
+        .score-container {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-light);
+        }
+
+        .moves {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-light);
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        #branding {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.05);
+            font-size: 3rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1;
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            background: var(--primary-color);
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 2rem;
+        }
+
+        .card-front {
+            background: var(--primary-color);
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: var(--accent-color);
+        }
+
+        .card.matched {
+            opacity: 0.7;
+            cursor: default;
+            background: var(--secondary-color);
+        }
+
+        .card.matched .card-front {
+            background: var(--secondary-color);
+        }
+
+        .card.matched .card-back {
+            background: var(--secondary-dark);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            z-index: 2;
+            display: none;
+        }
+
+        .game-over h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+        }
+
+        .game-over p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .game-over button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .game-over button:hover {
+            background: var(--primary-light);
+        }
+
+        .bottom-play-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .bottom-play-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(74, 144, 226, 0.4);
+        }
+
+        .bottom-play-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                padding: 1rem;
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .memory-grid {
+                gap: 0.5rem;
+            }
+
+            .card-front,
+            .card-back {
+                font-size: 1.5rem;
+            }
+
+            .user-stats {
+                gap: 1rem;
+            }
+
+            .stat {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo">
+            <span>🚀</span>
+            <span>HowParth Game Arena</span>
+        </div>
+        <div class="user-stats">
+            <div class="stat">
+                Player: <span id="usernameDisplay"></span>
+            </div>
+            <div class="stat">
+                Points: <span id="pointsDisplay">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="game-header">
+            <h1>Memory Flip</h1>
+        </div>
+        <div class="score-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="moves">Moves: <span id="moves">0</span></div>
+        </div>
+        <div class="memory-grid" id="memoryGrid">
+            <div id="branding">howparth</div>
+        </div>
+        <div class="game-over" id="gameOver">
+            <h2>Congratulations!</h2>
+            <p>You completed the game in <span id="finalMoves">0</span> moves!</p>
+            <button onclick="startGame()">Play Again</button>
+        </div>
+    </div>
+    <button class="bottom-play-button" onclick="startGame()">New Game</button>
+
+    <script>
+        const memoryGrid = document.getElementById('memoryGrid');
+        const scoreElement = document.getElementById('score');
+        const movesElement = document.getElementById('moves');
+        const finalMovesElement = document.getElementById('finalMoves');
+        const gameOverElement = document.getElementById('gameOver');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const pointsDisplay = document.getElementById('pointsDisplay');
+
+        // Load user data
+        const username = localStorage.getItem('howparth_username');
+        const points = parseInt(localStorage.getItem('howparth_points')) || 0;
+        usernameDisplay.textContent = username;
+        pointsDisplay.textContent = points;
+
+        // Game variables
+        let cards = [];
+        let score = 0;
+        let moves = 0;
+        let flippedCards = [];
+        let canFlip = true;
+
+        // Emojis for cards
+        const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+        const cardEmojis = [...emojis, ...emojis];
+
+        // Shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Create card element
+        function createCard(emoji) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const cardFront = document.createElement('div');
+            cardFront.className = 'card-front';
+            cardFront.textContent = emoji;
+            
+            const cardBack = document.createElement('div');
+            cardBack.className = 'card-back';
+            
+            card.appendChild(cardFront);
+            card.appendChild(cardBack);
+            
+            card.addEventListener('click', () => flipCard(card));
+            
+            return card;
+        }
+
+        // Flip card
+        function flipCard(card) {
+            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+            
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                moves++;
+                movesElement.textContent = moves;
+                
+                const [card1, card2] = flippedCards;
+                const emoji1 = card1.querySelector('.card-front').textContent;
+                const emoji2 = card2.querySelector('.card-front').textContent;
+                
+                if (emoji1 === emoji2) {
+                    // Match found
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    score += 10;
+                    scoreElement.textContent = score;
+                    flippedCards = [];
+                    canFlip = true;
+                    
+                    // Check if game is complete
+                    if (document.querySelectorAll('.matched').length === cards.length) {
+                        gameOver();
+                    }
+                } else {
+                    // No match
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        flippedCards = [];
+                        canFlip = true;
+                    }, 1000);
+                }
+            }
+        }
+
+        // Game over
+        function gameOver() {
+            finalMovesElement.textContent = moves;
+            gameOverElement.style.display = 'flex';
+
+            // Award points
+            const pointsToAdd = Math.floor(score / 2);
+            updatePoints(pointsToAdd);
+        }
+
+        // Update points
+        function updatePoints(pointsToAdd) {
+            const username = localStorage.getItem('howparth_username');
+            const currentPoints = parseInt(localStorage.getItem(`howparth_points_${username}`)) || 0;
+            const newPoints = currentPoints + pointsToAdd;
+            localStorage.setItem(`howparth_points_${username}`, newPoints.toString());
+            pointsDisplay.textContent = newPoints;
+        }
+
+        // Start game
+        function startGame() {
+            // Reset game state
+            score = 0;
+            moves = 0;
+            flippedCards = [];
+            canFlip = true;
+            scoreElement.textContent = score;
+            movesElement.textContent = moves;
+            gameOverElement.style.display = 'none';
+            
+            // Clear grid
+            memoryGrid.innerHTML = '';
+            cards = [];
+            
+            // Shuffle emojis
+            shuffleArray(cardEmojis);
+            
+            // Create cards
+            cardEmojis.forEach(emoji => {
+                const card = createCard(emoji);
+                memoryGrid.appendChild(card);
+                cards.push(card);
+            });
+        }
+
+        // Start game
+        startGame();
+    </script>
+</body>
+</html> 
