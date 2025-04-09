@@ -1,5 +1,5 @@
 {
-  "name": "howparth-game-arena",
+  "name": "Howparth_game_arena",
   "version": "1.0.0",
   "description": "Online game arena with GitHub integration",
   "main": "server.js",

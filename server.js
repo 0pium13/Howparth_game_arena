@@ -11,7 +11,7 @@ const octokit = new Octokit({
 });
 
 const REPO_OWNER = 'your-github-username';
-const REPO_NAME = 'howparth-game-arena';
+const REPO_NAME = 'Howparth_game_arena';
 const DATA_FILE = 'player-data.json';
 
 app.use(express.json());
