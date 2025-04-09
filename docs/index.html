@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HowParth Game Arena</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #4a90e2;
+            --primary-light: #6ba8ff;
+            --primary-dark: #2a5caa;
+            --secondary-color: #ff6b6b;
+            --secondary-light: #ff8e8e;
+            --secondary-dark: #cc3d3d;
+            --background-color: #0f172a;
+            --accent-color: #1e293b;
+            --text-color: #ffffff;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: var(--background-color);
+            font-family: 'Poppins', sans-serif;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(74, 144, 226, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 20%);
+            background-attachment: fixed;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .user-info {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--glass-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.1);
+        }
+
+        .user-info h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-light);
+        }
+
+        .user-info p {
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin: 4rem 0;
+        }
+
+        .welcome-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+
+        .welcome-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .username-form {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .username-form input {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .username-form button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .username-form button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .games-section {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(74, 144, 226, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .leaderboard-section {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(74, 144, 226, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .leaderboard-table th {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .leaderboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .rank {
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .points {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .medal {
+            margin-right: 0.5rem;
+        }
+
+        .medal.gold { color: #ffd700; }
+        .medal.silver { color: #c0c0c0; }
+        .medal.bronze { color: #cd7f32; }
+
+        .games-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-light);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .game-card {
+            background: var(--glass-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
+        }
+
+        .game-card h3 {
+            margin: 1rem 0;
+            color: var(--primary-light);
+        }
+
+        .game-card p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .game-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+
+            .username-form {
+                flex-direction: column;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info hidden" id="userInfo">
+            <h3>Player Stats</h3>
+            <p>Username: <span id="usernameDisplay"></span></p>
+            <p>Points: <span id="pointsDisplay">0</span></p>
+            <p>Level: <span id="levelDisplay">1</span></p>
+            <p>Title: <span id="titleDisplay">🎮 Noobling</span></p>
+        </div>
+
+        <div class="welcome-section">
+            <h1>Welcome to 🚀 HowParth Game Arena</h1>
+            <p>Enter your username to start your gaming journey!</p>
+            
+            <div class="username-form" id="usernameForm">
+                <input type="text" id="usernameInput" placeholder="Enter your username" required>
+                <button onclick="saveUsername()">Start Playing</button>
+            </div>
+        </div>
+
+        <div class="games-section hidden" id="gamesSection">
+            <h2>Choose a Game</h2>
+            <div class="games-grid">
+                <a href="snake.html" class="game-card" target="_blank">
+                    <div class="game-icon">🐍</div>
+                    <h3>Snake Game</h3>
+                    <p>Classic snake game with modern twist</p>
+                </a>
+                <a href="2048.html" class="game-card" target="_blank">
+                    <div class="game-icon">🔢</div>
+                    <h3>2048</h3>
+                    <p>Merge numbers to reach 2048</p>
+                </a>
+                <a href="sudoku.html" class="game-card" target="_blank">
+                    <div class="game-icon">🧩</div>
+                    <h3>Sudoku</h3>
+                    <p>Classic number puzzle game</p>
+                </a>
+                <a href="breakout.html" class="game-card" target="_blank">
+                    <div class="game-icon">🎯</div>
+                    <h3>Breakout</h3>
+                    <p>Break all the bricks</p>
+                </a>
+                <a href="memory.html" class="game-card" target="_blank">
+                    <div class="game-icon">🎴</div>
+                    <h3>Memory Flip</h3>
+                    <p>Test your memory skills</p>
+                </a>
+                <a href="dino.html" class="game-card" target="_blank">
+                    <div class="game-icon">🦖</div>
+                    <h3>Dino Game</h3>
+                    <p>Jump over obstacles</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="leaderboard-section hidden" id="leaderboardSection">
+            <div class="leaderboard-header">
+                <h2>Leaderboard</h2>
+                <button class="refresh-btn" onclick="refreshLeaderboard()">🔄 Refresh</button>
+            </div>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- Leaderboard entries will be added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Check if username exists in localStorage
+        const username = localStorage.getItem('howparth_username');
+        const points = parseInt(localStorage.getItem('howparth_points')) || 0;
+        const userInfo = document.getElementById('userInfo');
+        const usernameForm = document.getElementById('usernameForm');
+        const gamesSection = document.getElementById('gamesSection');
+
+        function updateUserInfo() {
+            const username = localStorage.getItem('howparth_username');
+            fetch(`/api/players/${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    const points = data.points || 0;
+                    const level = Math.floor(points / 100) + 1;
+                    let title = '🎮 Noobling';
+                    
+                    if (level >= 10) {
+                        title = '👑 Arena Master';
+                    } else if (level >= 5) {
+                        title = '🔥 Grinder';
+                    }
+
+                    document.getElementById('usernameDisplay').textContent = username;
+                    document.getElementById('pointsDisplay').textContent = points;
+                    document.getElementById('levelDisplay').textContent = level;
+                    document.getElementById('titleDisplay').textContent = title;
+                })
+                .catch(error => console.error('Error fetching user info:', error));
+        }
+
+        function saveUsername() {
+            const usernameInput = document.getElementById('usernameInput');
+            const username = usernameInput.value.trim();
+            
+            if (username) {
+                fetch('/api/players', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        points: 0
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    localStorage.setItem('howparth_username', username);
+                    usernameForm.classList.add('hidden');
+                    userInfo.classList.remove('hidden');
+                    gamesSection.classList.remove('hidden');
+                    updateUserInfo();
+                })
+                .catch(error => console.error('Error saving username:', error));
+            } else {
+                alert('Please enter a username');
+            }
+        }
+
+        // Check if username exists on page load
+        if (username) {
+            usernameForm.classList.add('hidden');
+            userInfo.classList.remove('hidden');
+            gamesSection.classList.remove('hidden');
+            updateUserInfo();
+        } else {
+            // Check for existing usernames from API
+            fetch('/api/players')
+                .then(response => response.json())
+                .then(players => {
+                    const existingUsername = Object.keys(players)[0];
+                    if (existingUsername) {
+                        // Auto-login with existing username
+                        localStorage.setItem('howparth_username', existingUsername);
+                        usernameForm.classList.add('hidden');
+                        userInfo.classList.remove('hidden');
+                        gamesSection.classList.remove('hidden');
+                        updateUserInfo();
+                    }
+                })
+                .catch(error => console.error('Error fetching players:', error));
+        }
+
+        // Add enter key support for username input
+        document.getElementById('usernameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                saveUsername();
+            }
+        });
+
+        // Update leaderboard functionality
+        function updateLeaderboard() {
+            fetch('/api/leaderboard')
+                .then(response => response.json())
+                .then(players => {
+                    const leaderboardBody = document.getElementById('leaderboardBody');
+                    leaderboardBody.innerHTML = '';
+
+                    players.forEach((player, index) => {
+                        const row = document.createElement('tr');
+                        
+                        let medal = '';
+                        if (index === 0) medal = '🥇';
+                        else if (index === 1) medal = '🥈';
+                        else if (index === 2) medal = '🥉';
+
+                        row.innerHTML = `
+                            <td class="rank">${medal} ${index + 1}</td>
+                            <td>${player.username}</td>
+                            <td class="points">${player.points}</td>
+                        `;
+                        leaderboardBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching leaderboard:', error));
+        }
+
+        function refreshLeaderboard() {
+            updateLeaderboard();
+        }
+
+        // Show leaderboard when clicking on points in top bar
+        document.getElementById('pointsDisplay').addEventListener('click', () => {
+            document.getElementById('gamesSection').classList.add('hidden');
+            document.getElementById('leaderboardSection').classList.remove('hidden');
+            updateLeaderboard();
+        });
+
+        // Show games section when clicking on logo
+        document.querySelector('.logo').addEventListener('click', () => {
+            document.getElementById('leaderboardSection').classList.add('hidden');
+            document.getElementById('gamesSection').classList.remove('hidden');
+        });
+
+        // Initialize leaderboard
+        updateLeaderboard();
+    </script>
+</body>
+</html> 
