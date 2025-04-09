@@ -266,217 +266,192 @@
 </head>
 <body>
     <div class="container">
-        <div class="user-info hidden" id="userInfo">
-            <h3>Player Stats</h3>
-            <p>Username: <span id="usernameDisplay"></span></p>
+        <div class="user-info hidden">
+            <h3>Welcome, <span id="usernameDisplay"></span>!</h3>
             <p>Points: <span id="pointsDisplay">0</span></p>
             <p>Level: <span id="levelDisplay">1</span></p>
             <p>Title: <span id="titleDisplay">🎮 Noobling</span></p>
         </div>
 
         <div class="welcome-section">
-            <h1>Welcome to 🚀 HowParth Game Arena</h1>
-            <p>Enter your username to start your gaming journey!</p>
-            
-            <div class="username-form" id="usernameForm">
-                <input type="text" id="usernameInput" placeholder="Enter your username" required>
-                <button onclick="saveUsername()">Start Playing</button>
+            <h1>HowParth Game Arena</h1>
+            <p>Play exciting games and compete with friends!</p>
+            <div class="username-form">
+                <input type="text" id="usernameInput" placeholder="Enter your username">
+                <button onclick="saveUsername()">Play</button>
             </div>
         </div>
 
-        <div class="games-section hidden" id="gamesSection">
+        <div class="games-section hidden">
             <h2>Choose a Game</h2>
             <div class="games-grid">
-                <a href="snake.html" class="game-card" target="_blank">
+                <div class="game-card" onclick="window.location.href='memory.html'">
+                    <div class="game-icon">🧠</div>
+                    <h3>Memory Flip</h3>
+                    <p>Test your memory with this classic card matching game</p>
+                </div>
+                <div class="game-card" onclick="window.location.href='snake.html'">
                     <div class="game-icon">🐍</div>
-                    <h3>Snake Game</h3>
-                    <p>Classic snake game with modern twist</p>
-                </a>
-                <a href="2048.html" class="game-card" target="_blank">
-                    <div class="game-icon">🔢</div>
-                    <h3>2048</h3>
-                    <p>Merge numbers to reach 2048</p>
-                </a>
-                <a href="sudoku.html" class="game-card" target="_blank">
-                    <div class="game-icon">🧩</div>
-                    <h3>Sudoku</h3>
-                    <p>Classic number puzzle game</p>
-                </a>
-                <a href="breakout.html" class="game-card" target="_blank">
+                    <h3>Snake</h3>
+                    <p>Guide the snake to eat food and grow longer</p>
+                </div>
+                <div class="game-card" onclick="window.location.href='breakout.html'">
                     <div class="game-icon">🎯</div>
                     <h3>Breakout</h3>
-                    <p>Break all the bricks</p>
-                </a>
-                <a href="memory.html" class="game-card" target="_blank">
-                    <div class="game-icon">🎴</div>
-                    <h3>Memory Flip</h3>
-                    <p>Test your memory skills</p>
-                </a>
-                <a href="dino.html" class="game-card" target="_blank">
+                    <p>Break all the bricks with your paddle and ball</p>
+                </div>
+                <div class="game-card" onclick="window.location.href='dino.html'">
                     <div class="game-icon">🦖</div>
                     <h3>Dino Game</h3>
-                    <p>Jump over obstacles</p>
-                </a>
+                    <p>Jump over obstacles in this endless runner</p>
+                </div>
+                <div class="game-card" onclick="window.location.href='2048.html'">
+                    <div class="game-icon">🔢</div>
+                    <h3>2048</h3>
+                    <p>Combine numbers to reach 2048</p>
+                </div>
+                <div class="game-card" onclick="window.location.href='sudoku.html'">
+                    <div class="game-icon">📝</div>
+                    <h3>Sudoku</h3>
+                    <p>Solve the classic number puzzle</p>
+                </div>
             </div>
         </div>
 
-        <div class="leaderboard-section hidden" id="leaderboardSection">
+        <div class="leaderboard-section hidden">
             <div class="leaderboard-header">
                 <h2>Leaderboard</h2>
-                <button class="refresh-btn" onclick="refreshLeaderboard()">🔄 Refresh</button>
+                <button onclick="updateLeaderboard()">Refresh</button>
             </div>
             <table class="leaderboard-table">
                 <thead>
                     <tr>
                         <th>Rank</th>
-                        <th>Player</th>
+                        <th>Username</th>
                         <th>Points</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboardBody">
-                    <!-- Leaderboard entries will be added here -->
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // Check if username exists in localStorage
-        const username = localStorage.getItem('howparth_username');
-        const points = parseInt(localStorage.getItem('howparth_points')) || 0;
-        const userInfo = document.getElementById('userInfo');
-        const usernameForm = document.getElementById('usernameForm');
-        const gamesSection = document.getElementById('gamesSection');
-
-        function updateUserInfo() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if username exists on page load
             const username = localStorage.getItem('howparth_username');
-            fetch(`/api/players/${username}`)
-                .then(response => response.json())
-                .then(data => {
-                    const points = data.points || 0;
-                    const level = Math.floor(points / 100) + 1;
-                    let title = '🎮 Noobling';
-                    
-                    if (level >= 10) {
-                        title = '👑 Arena Master';
-                    } else if (level >= 5) {
-                        title = '🔥 Grinder';
-                    }
+            const usernameForm = document.querySelector('.username-form');
+            const userInfo = document.querySelector('.user-info');
+            const gamesSection = document.querySelector('.games-section');
+            const leaderboardSection = document.querySelector('.leaderboard-section');
 
-                    document.getElementById('usernameDisplay').textContent = username;
-                    document.getElementById('pointsDisplay').textContent = points;
-                    document.getElementById('levelDisplay').textContent = level;
-                    document.getElementById('titleDisplay').textContent = title;
-                })
-                .catch(error => console.error('Error fetching user info:', error));
-        }
-
-        function saveUsername() {
-            const usernameInput = document.getElementById('usernameInput');
-            const username = usernameInput.value.trim();
-            
             if (username) {
-                fetch('/api/players', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        points: 0
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
+                usernameForm.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                gamesSection.classList.remove('hidden');
+                updateUserInfo();
+            }
+
+            // Add click event to play button
+            const playButton = document.querySelector('.username-form button');
+            playButton.addEventListener('click', saveUsername);
+
+            function saveUsername() {
+                const usernameInput = document.getElementById('usernameInput');
+                const username = usernameInput.value.trim();
+                
+                if (username) {
                     localStorage.setItem('howparth_username', username);
+                    if (!localStorage.getItem('howparth_points')) {
+                        localStorage.setItem('howparth_points', '0');
+                    }
+                    
                     usernameForm.classList.add('hidden');
                     userInfo.classList.remove('hidden');
                     gamesSection.classList.remove('hidden');
                     updateUserInfo();
-                })
-                .catch(error => console.error('Error saving username:', error));
-            } else {
-                alert('Please enter a username');
+                } else {
+                    alert('Please enter a username');
+                }
             }
-        }
 
-        // Check if username exists on page load
-        if (username) {
-            usernameForm.classList.add('hidden');
-            userInfo.classList.remove('hidden');
-            gamesSection.classList.remove('hidden');
-            updateUserInfo();
-        } else {
-            // Check for existing usernames from API
-            fetch('/api/players')
-                .then(response => response.json())
-                .then(players => {
-                    const existingUsername = Object.keys(players)[0];
-                    if (existingUsername) {
-                        // Auto-login with existing username
-                        localStorage.setItem('howparth_username', existingUsername);
-                        usernameForm.classList.add('hidden');
-                        userInfo.classList.remove('hidden');
-                        gamesSection.classList.remove('hidden');
-                        updateUserInfo();
+            function updateUserInfo() {
+                const username = localStorage.getItem('howparth_username');
+                const points = parseInt(localStorage.getItem('howparth_points')) || 0;
+                const level = Math.floor(points / 100) + 1;
+                let title = '🎮 Noobling';
+                
+                if (level >= 10) {
+                    title = '👑 Arena Master';
+                } else if (level >= 5) {
+                    title = '🔥 Grinder';
+                }
+
+                document.getElementById('usernameDisplay').textContent = username;
+                document.getElementById('pointsDisplay').textContent = points;
+                document.getElementById('levelDisplay').textContent = level;
+                document.getElementById('titleDisplay').textContent = title;
+            }
+
+            // Add enter key support for username input
+            document.getElementById('usernameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveUsername();
+                }
+            });
+
+            // Leaderboard functionality
+            function updateLeaderboard() {
+                // Get all players from localStorage
+                const players = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('howparth_username_')) {
+                        const username = localStorage.getItem(key);
+                        const points = parseInt(localStorage.getItem(`howparth_points_${username}`)) || 0;
+                        players.push({ username, points });
                     }
-                })
-                .catch(error => console.error('Error fetching players:', error));
-        }
+                }
 
-        // Add enter key support for username input
-        document.getElementById('usernameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                saveUsername();
+                // Sort players by points
+                players.sort((a, b) => b.points - a.points);
+
+                // Update leaderboard display
+                const leaderboardBody = document.getElementById('leaderboardBody');
+                leaderboardBody.innerHTML = '';
+
+                players.forEach((player, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Add medal emoji based on rank
+                    let medal = '';
+                    if (index === 0) medal = '🥇';
+                    else if (index === 1) medal = '🥈';
+                    else if (index === 2) medal = '🥉';
+
+                    row.innerHTML = `
+                        <td class="rank">${medal} ${index + 1}</td>
+                        <td>${player.username}</td>
+                        <td class="points">${player.points}</td>
+                    `;
+                    leaderboardBody.appendChild(row);
+                });
             }
+
+            // Show leaderboard when clicking on points display
+            document.getElementById('pointsDisplay').addEventListener('click', function() {
+                leaderboardSection.classList.remove('hidden');
+                updateLeaderboard();
+            });
+
+            // Hide leaderboard when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!leaderboardSection.contains(e.target) && e.target.id !== 'pointsDisplay') {
+                    leaderboardSection.classList.add('hidden');
+                }
+            });
         });
-
-        // Update leaderboard functionality
-        function updateLeaderboard() {
-            fetch('/api/leaderboard')
-                .then(response => response.json())
-                .then(players => {
-                    const leaderboardBody = document.getElementById('leaderboardBody');
-                    leaderboardBody.innerHTML = '';
-
-                    players.forEach((player, index) => {
-                        const row = document.createElement('tr');
-                        
-                        let medal = '';
-                        if (index === 0) medal = '🥇';
-                        else if (index === 1) medal = '🥈';
-                        else if (index === 2) medal = '🥉';
-
-                        row.innerHTML = `
-                            <td class="rank">${medal} ${index + 1}</td>
-                            <td>${player.username}</td>
-                            <td class="points">${player.points}</td>
-                        `;
-                        leaderboardBody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Error fetching leaderboard:', error));
-        }
-
-        function refreshLeaderboard() {
-            updateLeaderboard();
-        }
-
-        // Show leaderboard when clicking on points in top bar
-        document.getElementById('pointsDisplay').addEventListener('click', () => {
-            document.getElementById('gamesSection').classList.add('hidden');
-            document.getElementById('leaderboardSection').classList.remove('hidden');
-            updateLeaderboard();
-        });
-
-        // Show games section when clicking on logo
-        document.querySelector('.logo').addEventListener('click', () => {
-            document.getElementById('leaderboardSection').classList.add('hidden');
-            document.getElementById('gamesSection').classList.remove('hidden');
-        });
-
-        // Initialize leaderboard
-        updateLeaderboard();
     </script>
 </body>
 </html> 
